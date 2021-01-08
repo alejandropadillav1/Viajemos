@@ -1,0 +1,36 @@
+﻿@page "/"
+@inject ILibrosService LibroService;
+
+<h1>Libros</h1>
+
+@if (IsCargando)
+{
+    <MatAppBarAdjust></MatAppBarAdjust>
+    <MatProgressBar Indeterminate="true">Cargando datos</MatProgressBar>
+}
+else if (Libros != null)
+{
+
+}
+else
+{
+
+}
+
+
+@code
+{
+    private IEnumerable<LibroView> Libros { get; set; }
+    private bool IsCargando { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsCargando = true;
+        await InvokeAsync(StateHasChanged);
+        //Libros = await
+        await Task.Delay(4000).ConfigureAwait(false);
+        IsCargando = false;
+
+    }
+}
+
