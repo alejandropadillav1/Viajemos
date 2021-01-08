@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="MatBlazor" Version="2.8.0" />
+    <PackageReference Include="Radzen.Blazor" Version="2.18.10" />
   </ItemGroup>
 
   <ItemGroup>

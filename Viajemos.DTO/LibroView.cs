@@ -9,6 +9,8 @@ namespace Viajemos.DTO
     {
         public int OID { get; set; }
 
+        public int OIDEditorial { get; set; }
+
         public int ISBN { get; set; }
 
         public string Titulo { get; set; }
