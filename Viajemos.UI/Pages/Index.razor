@@ -1,5 +1,6 @@
 ﻿@page "/"
 @inject ILibrosService LibroService;
+@inject NavigationManager navigationManager;
 
 <h1>Libros</h1>
 
@@ -10,17 +11,77 @@
 }
 else if (Libros != null)
 {
+    <RadzenGrid AllowFiltering="true" AllowPaging="true" PageSize="15" AllowSorting="true" Data="@Libros" TItem="LibroView" Value="libroView">
+        <Columns>
+            <RadzenGridColumn Width="100px" TItem="LibroView" Property="@nameof(LibroView.Titulo)" Title="Título"></RadzenGridColumn>
+            <RadzenGridColumn Width="100px" TItem="LibroView" Property="@nameof(LibroView.Sinopsis)" Title="Sinopsis"></RadzenGridColumn>
+            <RadzenGridColumn Width="100px" TItem="LibroView" Property="@nameof(LibroView.Editorial.Nombre)" Filterable="false" Sortable="false" Title="Nombre Editorial">
+                <Template Context="libroView">
+                    <div>@libroView.Editorial?.Nombre</div>
+                </Template>
+            </RadzenGridColumn>
+
+            <RadzenGridColumn TItem="LibroView" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
+                <Template Context="libroView">
+                    <RadzenButton Icon="edit" Size="ButtonSize.Medium" Click="@(args => EditRow(libroView))">
+                    </RadzenButton>
+                </Template>
+
+            </RadzenGridColumn>
+
+        </Columns>
+    </RadzenGrid>
+    @if (libroViewSeleccionado != null)
+    {
+        <MatDialog @bind-IsOpen="@dialogIsOpen">
+            <EditForm Model="libroViewSeleccionado">
+                <DataAnnotationsValidator/>
+                    
+                    <MatDialogTitle>Edición del libro</MatDialogTitle>
+                    <MatDialogContent>
+                        <p>Título</p>
+                        <MatTextField @bind-Value="@libroViewSeleccionado.Titulo"></MatTextField>
+                        <ValidationMessage For="@(() => libroViewSeleccionado.Titulo)" />
+                        <p>Sinopsis</p>
+                        <MatTextField @bind-Value="@libroViewSeleccionado.Sinopsis"></MatTextField>
+                        <ValidationMessage For="@(() => libroViewSeleccionado.Sinopsis)" />
+                        <p>ISBN</p>
+                        <MatTextField @bind-Value="@libroViewSeleccionado.ISBN"></MatTextField>
+                        <ValidationMessage For="@(() => libroViewSeleccionado.ISBN)" />
+                        <p>Número de Páginas</p>
+                        <MatTextField @bind-Value="@libroViewSeleccionado.NumeroPaginas"></MatTextField>
+                        <ValidationMessage For="@(() => libroViewSeleccionado.NumeroPaginas)" />
+
+
+                    </MatDialogContent>
+
+                    <MatDialogActions>
+                        <MatButton OnClick="@SaveClick">Guardar</MatButton>
+                        <MatButton OnClick="@OkClick">Cancelar</MatButton>
+                    </MatDialogActions>
+  
+
+            </EditForm>
+
+        </MatDialog>
+    }
 
 }
 else
 {
-
+    <h1>No hay información guardada en la base de datos, se debe generar desde API Swagger o al url https://localhost:44331 en la sección Carga Aleatoria Masiva</h1>
 }
 
 
 @code
 {
+
     private IEnumerable<LibroView> Libros { get; set; }
+    private LibroView libroView { get; set; }
+    private LibroView libroViewSeleccionado { get; set; }
+    private List<EditorialView> Editoriales { get; set; }
+    bool dialogIsOpen = false;
+
     private bool IsCargando { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -28,9 +89,29 @@ else
         IsCargando = true;
         await InvokeAsync(StateHasChanged);
         Libros = await LibroService.GetLibrosAsync(new System.Threading.CancellationToken()).ConfigureAwait(false);
-        //await Task.Delay(4000).ConfigureAwait(false);
+        Editoriales = await LibroService.GetEditorialesAsync(new System.Threading.CancellationToken()).ConfigureAwait(false);
         IsCargando = false;
 
+    }
+    void EditRow(LibroView libroView)
+    {
+       
+        libroViewSeleccionado = libroView;
+
+
+
+        dialogIsOpen = true;
+    }
+    async Task SaveClick()
+    {
+        await LibroService.ActualizarLibro(libroViewSeleccionado, new System.Threading.CancellationToken());
+        Libros = await LibroService.GetLibrosAsync(new System.Threading.CancellationToken()).ConfigureAwait(false);
+        dialogIsOpen = false;
+
+    }
+    async Task OkClick()
+    {
+        dialogIsOpen = false;
     }
 }
 

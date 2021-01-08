@@ -42,13 +42,15 @@ namespace Viajemos.API.Controller
                 {
                     Nombre = x.Editorial.Nombre,
                     Sede = x.Editorial.Sede,
+                    OID = x.Editorial.Oid
                 } : null,
                 ISBN = x.ISBN,
                 Sinopsis = x.Sinopsis,
                 Titulo = x.Título,
                 NumeroPaginas = x.NumeroPaginas,
-                
-            }) ;
+                OID = x.Oid
+
+            }); ;
             return Ok(await libros.ToListAsync());
         }
 
@@ -64,11 +66,13 @@ namespace Viajemos.API.Controller
                     {
                         Nombre = libro.Editorial.Nombre,
                         Sede = libro.Editorial.Sede,
+                        OID = libro.Editorial.Oid
                     } : null,
                     ISBN = libro.ISBN,
                     Sinopsis = libro.Sinopsis,
                     Titulo = libro.Título,
                     NumeroPaginas = libro.NumeroPaginas,
+                    OID = libro.Oid
                 });
             else
                 return NotFound();
