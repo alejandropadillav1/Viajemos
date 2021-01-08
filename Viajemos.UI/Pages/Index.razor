@@ -27,8 +27,8 @@ else
     {
         IsCargando = true;
         await InvokeAsync(StateHasChanged);
-        //Libros = await
-        await Task.Delay(4000).ConfigureAwait(false);
+        Libros = await LibroService.GetLibrosAsync(new System.Threading.CancellationToken()).ConfigureAwait(false);
+        //await Task.Delay(4000).ConfigureAwait(false);
         IsCargando = false;
 
     }

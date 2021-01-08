@@ -9,6 +9,7 @@ using Radzen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Viajemos.UI.Interface;
 using Viajemos.UI.Services;
@@ -29,8 +30,16 @@ namespace Viajemos.UI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+            var appSettingSection = Configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettingSection);
             services.AddServerSideBlazor();
-            services.AddScoped<ILibrosService, LibroService>();
+            services.AddHttpClient<ILibrosService, LibroService>().ConfigureHttpMessageHandlerBuilder(builder =>
+            {
+                builder.PrimaryHandler = new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = (m, c, ch, e) => true
+                };
+            });
             services.AddScoped<DialogService>();
             services.AddScoped<NotificationService>();
             services.AddScoped<TooltipService>();
